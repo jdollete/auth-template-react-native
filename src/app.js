@@ -1,10 +1,19 @@
 import React from 'react';
 import { View } from 'react-native';
-import * as firebase from 'firebase'; 
+import * as firebase from 'firebase';
 import { Header } from './components/common';
 import LoginForm from './components/LoginForm';
 
 class App extends React.Component {
+
+  constructor(props) {
+    super(props);
+
+    this.state = {
+      loggedIn: false
+    };
+  }
+
 
   componentWillMount() {
     firebase.initializeApp({
@@ -14,6 +23,15 @@ class App extends React.Component {
       projectId: 'auth-template-7682c',
       storageBucket: 'auth-template-7682c.appspot.com',
       messagingSenderId: '296452916027'
+    });
+
+    // method if the user is signed in or out
+    firebase.auth().onAuthStateChanged((user) => {
+      if (user) {
+        this.setState({ loggedIn: true });
+      } else {
+        this.setState({ loggedIn: false });
+      }
     });
   }
 

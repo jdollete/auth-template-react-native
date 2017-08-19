@@ -1,5 +1,5 @@
 import React from 'react';
-import { Text, StyleSheet } from 'react-native';
+import { Text, StyleSheet, Alert } from 'react-native';
 import * as firebase from 'firebase';
 import { Button, Card, CardSection, Input, Spinner } from './common';
 
@@ -11,7 +11,6 @@ class LoginForm extends React.Component {
     this.state = {
       email: '',
       password: '',
-      error: '',
       loading: false
     };
 
@@ -23,7 +22,7 @@ class LoginForm extends React.Component {
   onButtonPress() {
     const { email, password } = this.state;
 
-    this.setState({ error: '', loading: true });
+    this.setState({ loading: true });
 
     firebase.auth().signInWithEmailAndPassword(email, password)
       .then(this.onLoginSuccess)
@@ -35,7 +34,14 @@ class LoginForm extends React.Component {
   }
 
   onLoginFail() {
-    this.setState({ error: 'Authentication Failed.', loading: false })
+    this.setState({ loading: false })
+    Alert.alert(
+      'Authentication Failed',
+      'The username or password you entered is incorrect.',
+      [
+        {text: 'OK', onPress: () => console.log('OK Pressed')},
+      ]
+    )
   }
 
   onLoginSuccess() {
@@ -43,7 +49,6 @@ class LoginForm extends React.Component {
       email: '',
       password: '',
       loading: false,
-      error: ''
     });
   }
 
@@ -94,12 +99,12 @@ class LoginForm extends React.Component {
   }
 }
 
-const styles = StyleSheet.create({
-  errorTextStyle: {
-    fontSize: 20,
-    alignSelf: 'center',
-    color: 'red'
-  }
-});
+// const styles = StyleSheet.create({
+//   errorTextStyle: {
+//     fontSize: 20,
+//     alignSelf: 'center',
+//     color: 'red'
+//   }
+// });
 
 export default LoginForm;

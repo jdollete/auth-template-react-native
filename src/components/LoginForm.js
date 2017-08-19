@@ -1,6 +1,6 @@
 import React from 'react';
-import { Text, StyleSheet } from 'react-native';
-import firebase from 'firebase';
+import { Text, StyleSheet, Alert } from 'react-native';
+import * as firebase from 'firebase';
 import { Button, Card, CardSection, Input, Spinner } from './common';
 
 class LoginForm extends React.Component {
@@ -11,25 +11,45 @@ class LoginForm extends React.Component {
     this.state = {
       email: '',
       password: '',
-      error: '',
       loading: false
     };
 
     this.onButtonPress = this.onButtonPress.bind(this);
+    this.onLoginSuccess = this.onLoginSuccess.bind(this);
+    this.onLoginFail = this.onLoginFail.bind(this);
   }
 
   onButtonPress() {
     const { email, password } = this.state;
 
-    this.setState({ error: '', loading: true });
+    this.setState({ loading: true });
 
     firebase.auth().signInWithEmailAndPassword(email, password)
+      .then(this.onLoginSuccess)
       .catch(() => {
         firebase.auth().createUserWithEmailAndPassword(email, password)
-          .catch(() => {
-            this.setState({ error: 'Authentication Failed.' });
-          });
+          .then(this.onLoginSuccess)
+          .catch(this.onLoginFail);
       });
+  }
+
+  onLoginFail() {
+    this.setState({ loading: false })
+    Alert.alert(
+      'Authentication Failed',
+      'The username or password you entered is incorrect.',
+      [
+        {text: 'OK', onPress: () => console.log('OK Pressed')},
+      ]
+    )
+  }
+
+  onLoginSuccess() {
+    this.setState({
+      email: '',
+      password: '',
+      loading: false,
+    });
   }
 
   renderButton() {
@@ -79,12 +99,12 @@ class LoginForm extends React.Component {
   }
 }
 
-const styles = StyleSheet.create({
-  errorTextStyle: {
-    fontSize: 20,
-    alignSelf: 'center',
-    color: 'red'
-  }
-});
+// const styles = StyleSheet.create({
+//   errorTextStyle: {
+//     fontSize: 20,
+//     alignSelf: 'center',
+//     color: 'red'
+//   }
+// });
 
 export default LoginForm;
